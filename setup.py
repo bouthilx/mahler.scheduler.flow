@@ -31,9 +31,12 @@ setup_args = dict(
             'flow = mahler.scheduler.flow'
             ],
         },
-    install_requires=['mahler.core'],
+    install_requires=['mahler.core', 'flow'],
     tests_require=tests_require,
     setup_requires=['setuptools', 'pytest-runner>=2.0,<3dev'],
+    dependency_links=[
+        "git+https://github.com/bouthilx/flow.git",
+    ],
     extras_require=dict(test=tests_require),
     # "Zipped eggs don't play nicely with namespace packaging"
     # from https://github.com/pypa/sample-namespace-packages
