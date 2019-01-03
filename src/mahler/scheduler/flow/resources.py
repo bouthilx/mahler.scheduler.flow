@@ -22,7 +22,7 @@ FLOW_OPTIONS_TEMPLATE = "{array}mem=20000M;time=2:59:00;job-name={job_name}"
 
 FLOW_TEMPLATE = "flow-submit {container} --config {file_path} --options {options}"
 
-COMMAND_TEMPLATE = "mahler execute --container {container} --tags {tags}"
+COMMAND_TEMPLATE = "mahler execute{container}{tags}{options}"
 
 SUBMIT_COMMANDLINE_TEMPLATE = "{flow} launch {command}"
 
@@ -52,7 +52,7 @@ class FlowResources(Resources):
         total_jobs = sum(number for name, number in states.items() if name != 'CG')
         return max(self.max_workers - total_jobs, 0)
 
-    def submit(self, tasks, container, tags=tuple()):
+    def submit(self, tasks, container=None, tags=tuple(), working_dir=None):
         """
         """
         nodes_available = self.available()
@@ -76,7 +76,10 @@ class FlowResources(Resources):
         flow_command = FLOW_TEMPLATE.format(
             container=container, file_path=file_path, options=flow_options)
 
-        command = COMMAND_TEMPLATE.format(container=container, tags=" ".join(tags))
+        command = COMMAND_TEMPLATE.format(
+            container=" --container " + container if container else "",
+            tags=" --tags " + " ".join(tags) if tags else "",
+            options=" --working-dir={}".format(working_dir) if working_dir else "")
 
         submit_command = SUBMIT_COMMANDLINE_TEMPLATE.format(flow=flow_command, command=command)
 
