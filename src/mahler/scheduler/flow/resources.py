@@ -11,10 +11,15 @@ TODO: Write long description
 
 """
 import getpass
+import logging
 import os
 import subprocess
 
 from mahler.core.resources import Resources
+
+
+logger = logging.getLogger(__name__)
+
 
 SUBMISSION_ROOT = os.environ['FLOW_SUBMISSION_DIR']
 
@@ -49,13 +54,21 @@ class FlowResources(Resources):
 
             states[line] += 1
 
+        logger.debug('Nodes availability')
+        for state, number in sorted(states.items()):
+            logging.debug('{}: {}'.format(state, number))
+
         total_jobs = sum(number for name, number in states.items() if name != 'CG')
+
+        logging.debug('total: {}'.format(total_jobs))
+
         return max(self.max_workers - total_jobs, 0)
 
     def submit(self, tasks, container=None, tags=tuple(), working_dir=None):
         """
         """
         nodes_available = self.available()
+        logger.info('{} nodes available'.format(nodes_available))
         if not nodes_available:
             return
         array_option = 'array=1-{};'.format(min(len(tasks), nodes_available))
