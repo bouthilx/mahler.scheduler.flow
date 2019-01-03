@@ -49,6 +49,10 @@ class FlowResources(Resources):
         out = str(out, encoding='utf-8')
         states = dict()
         for line in out.split("\n")[1:]:  # ignore `ST` header
+            line = line.strip()
+            if not line:
+                continue
+
             if line not in states:
                 states[line] = 0
 
