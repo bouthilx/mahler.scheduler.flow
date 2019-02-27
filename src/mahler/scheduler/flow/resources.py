@@ -80,7 +80,7 @@ class FlowResources(Resources):
             array=array_option, job_name=".".join(sorted(tags)))
 
         resources = []
-        for name, value in tasks[0].resources.items():
+        for name, value in tasks[0]['facility']['resources'].items():
             if name == 'cpu':
                 resources.append('cpus-per-task={}'.format(value))
             elif name == 'gpu':
