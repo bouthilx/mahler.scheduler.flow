@@ -90,7 +90,7 @@ class FlowResources(Resources):
             else:
                 raise ValueError('Unknown option: {}'.format(name))
 
-        flow_options += ";".join(resources)
+        flow_options += ";" + ";".join(resources)
 
         submission_dir = os.path.join(SUBMISSION_ROOT, container)
         if not os.path.isdir(submission_dir):
