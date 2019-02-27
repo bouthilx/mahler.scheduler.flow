@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 SUBMISSION_ROOT = os.environ['FLOW_SUBMISSION_DIR']
 
-FLOW_OPTIONS_TEMPLATE = "{array}mem=20000M;time=2:59:00;job-name={job_name}"
+FLOW_OPTIONS_TEMPLATE = "{array}time=2:59:00;job-name={job_name}"
 
 FLOW_TEMPLATE = "flow-submit {container} --config {file_path} --options {options}"
 
@@ -78,6 +78,19 @@ class FlowResources(Resources):
         array_option = 'array=1-{};'.format(min(len(tasks), nodes_available))
         flow_options = FLOW_OPTIONS_TEMPLATE.format(
             array=array_option, job_name=".".join(sorted(tags)))
+
+        resources = []
+        for name, value in tasks[0].resources.items():
+            if name == 'cpu':
+                resources.append('cpus-per-task={}'.format(value))
+            elif name == 'gpu':
+                resources.append('gres=gpu:{}'.format(value))
+            elif name == 'mem':
+                resources.append('mem={}'.format(value))
+            else:
+                raise ValueError('Unknown option: {}'.format(name))
+
+        flow_options += ";".join(resources)
 
         submission_dir = os.path.join(SUBMISSION_ROOT, container)
         if not os.path.isdir(submission_dir):
